@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     [Header("Horizontal Movement Settings: ")] 
     [SerializeField] private float walkSpeed = 1;
     [SerializeField] private float jumpForce = 45;
+    private float jumpBufferCounter = 0;
+    [SerializeField] private float jumpBufferFrames;
 
     [Header("Ground Check Settings:")]
     [SerializeField] private Transform groundCheckPoint;
@@ -42,9 +44,9 @@ public class PlayerController : MonoBehaviour
 
     void Start() 
     {
-        pState = GetComponent<PlayerStateList>();
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        pState = GetComponent<PlayerStateList>();
     }
 
     void Update() 
@@ -66,12 +68,12 @@ public class PlayerController : MonoBehaviour
     {
         if(xAxis < 0) 
         {
-            transform.localScale = new Vector2(-1, transform.localScale.y);
+            transform.localScale = new Vector2(-Mathf.Abs(transform.localScale.x), transform.localScale.y);
         }
 
         else if(xAxis > 0) 
         {
-            transform.localScale = new Vector2(1, transform.localScale.y);
+            transform.localScale = new Vector2(Mathf.Abs(transform.localScale.x), transform.localScale.y);
         }
     }
 
@@ -102,18 +104,18 @@ public class PlayerController : MonoBehaviour
     {
         if(Input.GetButtonUp("Jump") && rb.linearVelocity.y > 0) 
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
             pState.isJumping = false;
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
         }
 
         if(!pState.isJumping) 
         {
-
-        }
-        if(Input.GetButtonDown("Jump") && Grounded()) 
-        {
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce);
-            pState.isJumping = true;
+            //if (Input.GetButtonDown("Jump") && Grounded())
+            if(jumpBufferCounter > 0 && Grounded())
+            {
+                pState.isJumping = true;
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce);
+            }
         }
 
         anim.SetBool("Jumping", !Grounded());
@@ -125,6 +127,15 @@ public class PlayerController : MonoBehaviour
         if(Grounded()) 
         {
             pState.isJumping = false;
+        }
+
+        if(Input.GetButtonDown("Jump"))
+        {
+            jumpBufferCounter = jumpBufferFrames;
+        }
+        else
+        {
+            jumpBufferCounter--;
         }
     }
 }
