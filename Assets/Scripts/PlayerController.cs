@@ -10,11 +10,15 @@ public class PlayerController : MonoBehaviour
     //Movement
     [Header("Horizontal Movement Settings: ")] 
     [SerializeField] private float walkSpeed = 1;
+
+    [Header("Jump Settings")]
     [SerializeField] private float jumpForce = 45;
     private float jumpBufferCounter = 0;
     [SerializeField] private float jumpBufferFrames;
     private float coyoteTimeCounter = 0;
     [SerializeField] private float coyoteTime;
+    private int airJumpCounter = 0;
+    [SerializeField] private int maxAirJumps;
 
     [Header("Ground Check Settings:")]
     [SerializeField] private Transform groundCheckPoint;
@@ -118,6 +122,12 @@ public class PlayerController : MonoBehaviour
                 pState.isJumping = true;
                 rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce);
             }
+            else if(!Grounded() && airJumpCounter < maxAirJumps && Input.GetButtonDown("Jump")) 
+            {
+                pState.isJumping = true;
+                airJumpCounter++;
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce);
+            }
         }
 
         anim.SetBool("Jumping", !Grounded());
@@ -130,6 +140,7 @@ public class PlayerController : MonoBehaviour
         {
             pState.isJumping = false;
             coyoteTimeCounter = coyoteTime;
+            airJumpCounter = 0;
         }
         else 
         {
