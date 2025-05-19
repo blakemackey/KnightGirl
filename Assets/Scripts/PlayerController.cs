@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float dashSpeed;
     [SerializeField] private float dashTime;
     [SerializeField] private float dashCooldown;
-    [SerializeField] GameObject dashEffect;
+    //[SerializeField] GameObject dashEffect;
     [Space(5)]
 
 
@@ -49,7 +49,11 @@ public class PlayerController : MonoBehaviour
     private float gravity;
     Animator anim;
     private bool canDash = true;
-    //Check if dash has been used in air
+    //Check if dash has been used in 
+    
+    bool attack = false;
+    float timeBetweenAttack, timeSinceAttack;
+
     private bool hasDashed;
 
     public static PlayerController Instance;
@@ -89,11 +93,13 @@ public class PlayerController : MonoBehaviour
         Move();
         Jump();
         StartDash();
+        Attack();
     }
 
     void GetInputs() 
     {
         xAxis = Input.GetAxisRaw("Horizontal");
+        attack = Input.GetMouseButtonDown(0);
     }
 
     //Flip sprite when changing directions
@@ -142,7 +148,7 @@ public class PlayerController : MonoBehaviour
         //Stop falling during dash
         rb.gravityScale = 0;
         rb.linearVelocity = new Vector2(transform.localScale.x * dashSpeed, 0);
-        if(Grounded()) Instantiate(dashEffect, transform);
+        //if(Grounded()) Instantiate(dashEffect, transform);
         yield return new WaitForSeconds(dashTime);
         rb.gravityScale = gravity;
 
@@ -150,6 +156,16 @@ public class PlayerController : MonoBehaviour
         pState.isDashing = false;
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
+    }
+
+    void Attack() 
+    {
+        timeSinceAttack += Time.deltaTime;
+        if(attack && timeSinceAttack >= timeBetweenAttack) 
+        {
+            timeSinceAttack = 0;
+            anim.SetTrigger("Attacking");
+        }
     }
 
     //Set up raycast for hit detection on ground
