@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float walkSpeed = 1;
     [Space(5)]
 
-    [Header("Jump Settings")]
+    [Header("Jump Settings:")]
     [SerializeField] private float jumpForce = 45;
     private float jumpBufferCounter = 0;
     [SerializeField] private float jumpBufferFrames;
@@ -34,25 +34,41 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask whatIsGround;
     [Space(5)]
 
-    [Header("Dash Settings")]
+    [Header("Dash Settings:")]
     [SerializeField] private float dashSpeed;
     [SerializeField] private float dashTime;
     [SerializeField] private float dashCooldown;
-    //[SerializeField] GameObject dashEffect;
+    [SerializeField] GameObject dashEffect;
     [Space(5)]
+
+    //Create different attack areas
+    [Header("Dash Settings:")]
+    [SerializeField] private Transform SideAttackTransform;
+    [SerializeField] private Vector2 SideAttackArea;
+    [SerializeField] private Transform UpAttackTransform;
+    [SerializeField] private Vector2 UpAttackArea;
+    [SerializeField] private Transform DownAttackTransform;
+    [SerializeField] private Vector2 DownAttackArea;
+    [SerializeField] private LayerMask attackableLayer;
+
+    [SerializeField] private float timeBetweenAttack;
+    private float timeSinceAttack;
+    [Space(5)]
+
 
 
     //References
     PlayerStateList pState;
     Rigidbody2D rb;
+
+    private bool attack = false;
     private float xAxis;
+    private float yAxis;
+
     private float gravity;
     Animator anim;
     private bool canDash = true;
     //Check if dash has been used in 
-    
-    bool attack = false;
-    float timeBetweenAttack, timeSinceAttack;
 
     private bool hasDashed;
 
@@ -81,6 +97,16 @@ public class PlayerController : MonoBehaviour
         gravity = rb.gravityScale;
     }
 
+    //Create attack areas
+    private void OnDrawGizmos()
+    {
+        //Make wirecube red for debugging
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(SideAttackTransform.position, SideAttackArea);
+        Gizmos.DrawWireCube(UpAttackTransform.position, UpAttackArea);
+        Gizmos.DrawWireCube(DownAttackTransform.position, DownAttackArea);
+    }
+
     void Update() 
     {
         GetInputs();
@@ -99,6 +125,7 @@ public class PlayerController : MonoBehaviour
     void GetInputs() 
     {
         xAxis = Input.GetAxisRaw("Horizontal");
+        yAxis = Input.GetAxisRaw("Vertical");
         attack = Input.GetMouseButtonDown(0);
     }
 
@@ -148,7 +175,7 @@ public class PlayerController : MonoBehaviour
         //Stop falling during dash
         rb.gravityScale = 0;
         rb.linearVelocity = new Vector2(transform.localScale.x * dashSpeed, 0);
-        //if(Grounded()) Instantiate(dashEffect, transform);
+        if(Grounded()) Instantiate(dashEffect, transform);
         yield return new WaitForSeconds(dashTime);
         rb.gravityScale = gravity;
 
@@ -161,10 +188,37 @@ public class PlayerController : MonoBehaviour
     void Attack() 
     {
         timeSinceAttack += Time.deltaTime;
+        //Prevent spamming attacks
         if(attack && timeSinceAttack >= timeBetweenAttack) 
         {
             timeSinceAttack = 0;
             anim.SetTrigger("Attacking");
+
+            //call hit function based on where player is attacking
+            if(yAxis == 0 || yAxis < 0 && Grounded()) 
+            {
+                Hit(SideAttackTransform, SideAttackArea);
+            }
+
+            else if(yAxis > 0) 
+            {
+                Hit(UpAttackTransform, UpAttackArea);
+            }
+
+            else if(yAxis < 0 && !Grounded()) 
+            {
+                Hit(DownAttackTransform, DownAttackArea);
+            }
+        }
+    }
+
+    private void Hit(Transform _attackTransform, Vector2 _attackArea)
+    {
+        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
+
+        if(objectsToHit.Length > 0) 
+        {
+            Debug.Log("Hit");
         }
     }
 
