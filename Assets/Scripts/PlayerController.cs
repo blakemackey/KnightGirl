@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
     [Space(5)]
 
     //Create different attack areas
-    [Header("Dash Settings:")]
+    [Header("Attack Settings:")]
     [SerializeField] private Transform SideAttackTransform;
     [SerializeField] private Vector2 SideAttackArea;
     [SerializeField] private Transform UpAttackTransform;
@@ -50,6 +50,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform DownAttackTransform;
     [SerializeField] private Vector2 DownAttackArea;
     [SerializeField] private LayerMask attackableLayer;
+    [SerializeField] private float damage;
+    [SerializeField] private GameObject slashEffect;
 
     [SerializeField] private float timeBetweenAttack;
     private float timeSinceAttack;
@@ -215,10 +217,21 @@ public class PlayerController : MonoBehaviour
     private void Hit(Transform _attackTransform, Vector2 _attackArea)
     {
         Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
+        List<Enemy> hitEnemies = new List<Enemy>();
 
-        if(objectsToHit.Length > 0) 
+        if (objectsToHit.Length > 0)
         {
             Debug.Log("Hit");
+        }
+
+        for (int i = 0; i < objectsToHit.Length; i++)
+        {
+            Enemy e = objectsToHit[i].GetComponent<Enemy>();
+            if (e && !hitEnemies.Contains(e))
+            {
+                e.EnemyHit(damage);
+                hitEnemies.Add(e);
+            }
         }
     }
 
