@@ -197,19 +197,22 @@ public class PlayerController : MonoBehaviour
             anim.SetTrigger("Attacking");
 
             //call hit function based on where player is attacking
-            if(yAxis == 0 || yAxis < 0 && Grounded()) 
+            if (yAxis == 0 || yAxis < 0 && Grounded())
             {
                 Hit(SideAttackTransform, SideAttackArea);
+                Instantiate(slashEffect, SideAttackTransform);
             }
 
-            else if(yAxis > 0) 
+            else if (yAxis > 0)
             {
                 Hit(UpAttackTransform, UpAttackArea);
+                SlashEffectAtAngle(slashEffect, 90, UpAttackTransform);
             }
 
-            else if(yAxis < 0 && !Grounded()) 
+            else if (yAxis < 0 && !Grounded())
             {
                 Hit(DownAttackTransform, DownAttackArea);
+                SlashEffectAtAngle(slashEffect, -90, DownAttackTransform);
             }
         }
     }
@@ -235,20 +238,27 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    //Set up raycast for hit detection on ground
-    public bool Grounded() 
+    private void SlashEffectAtAngle(GameObject _slashEffect, int _effectAngle, Transform _attackTransform)
     {
-        if(Physics2D.Raycast(groundCheckPoint.position, Vector2.down, groundCheckY, whatIsGround)
-            || Physics2D.Raycast(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround)
-            || Physics2D.Raycast(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround)) 
-            {
-                return true;
-            }
+        _slashEffect = Instantiate(_slashEffect, _attackTransform);
+        _slashEffect.transform.eulerAngles = new Vector3(0, 0, _effectAngle);
+        _slashEffect.transform.localScale = new Vector2(transform.localScale.x, transform.localScale.y);
+    }
 
-            else 
-            {
-                return false;
-            }
+    //Set up raycast for hit detection on ground
+    public bool Grounded()
+    {
+        if (Physics2D.Raycast(groundCheckPoint.position, Vector2.down, groundCheckY, whatIsGround)
+            || Physics2D.Raycast(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround)
+            || Physics2D.Raycast(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround))
+        {
+            return true;
+        }
+
+        else
+        {
+            return false;
+        }
     }
 
     //Add jump function
