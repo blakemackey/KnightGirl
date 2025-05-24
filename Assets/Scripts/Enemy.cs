@@ -5,22 +5,22 @@ using UnityEngine.Rendering;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] float health;
-    [SerializeField] float recoilLength;
-    [SerializeField] float recoilFactor;
-    [SerializeField] bool isRecoiling = false;
+    [SerializeField] protected float health;
+    [SerializeField] protected float recoilLength;
+    [SerializeField] protected float recoilFactor;
+    [SerializeField] protected bool isRecoiling = false;
 
-    float recoilTimer;
-    Rigidbody2D rb;
+    protected float recoilTimer;
+    protected Rigidbody2D rb;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    protected virtual void Start()
     {
         rb = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         if (health <= 0)
         {
@@ -42,7 +42,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void EnemyHit(float _damageDone, Vector2 _hitDirection, float _hitForce)
+    public virtual void EnemyHit(float _damageDone, Vector2 _hitDirection, float _hitForce)
     {
         health -= _damageDone;
         //register hit and apply recoil
