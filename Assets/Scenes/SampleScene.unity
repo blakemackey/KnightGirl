@@ -652,6 +652,7 @@ GameObject:
   - component: {fileID: 707184689}
   - component: {fileID: 707184688}
   - component: {fileID: 707184687}
+  - component: {fileID: 707184692}
   m_Layer: 6
   m_Name: Enemy
   m_TagString: Untagged
@@ -666,7 +667,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 707184686}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 16be4c724932e0242a9f59d461c56bf3, type: 3}
   m_Name: 
@@ -675,6 +676,8 @@ MonoBehaviour:
   recoilLength: 0
   recoilFactor: 0
   isRecoiling: 0
+  player: {fileID: 0}
+  speed: 0
 --- !u!61 &707184688
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -818,6 +821,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &707184692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 707184686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a2d73689c1440c4baab6eb9027c18ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 10
+  recoilLength: 0
+  recoilFactor: 0
+  isRecoiling: 0
+  player: {fileID: 0}
+  speed: 10
 --- !u!1 &992024168
 GameObject:
   m_ObjectHideFlags: 0

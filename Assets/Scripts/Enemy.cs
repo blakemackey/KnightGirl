@@ -10,6 +10,9 @@ public class Enemy : MonoBehaviour
     [SerializeField] protected float recoilFactor;
     [SerializeField] protected bool isRecoiling = false;
 
+    [SerializeField] protected PlayerController player;
+    [SerializeField] protected float speed;
+
     protected float recoilTimer;
     protected Rigidbody2D rb;
 
@@ -34,6 +37,7 @@ public class Enemy : MonoBehaviour
             {
                 recoilTimer += Time.deltaTime;
             }
+
             else
             {
                 isRecoiling = false;
