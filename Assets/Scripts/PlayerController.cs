@@ -45,10 +45,13 @@ public class PlayerController : MonoBehaviour
     [Header("Attack Settings:")]
     [SerializeField] private Transform SideAttackTransform;
     [SerializeField] private Vector2 SideAttackArea;
+
     [SerializeField] private Transform UpAttackTransform;
     [SerializeField] private Vector2 UpAttackArea;
+
     [SerializeField] private Transform DownAttackTransform;
     [SerializeField] private Vector2 DownAttackArea;
+
     [SerializeField] private LayerMask attackableLayer;
     [SerializeField] private float damage;
     [SerializeField] private GameObject slashEffect;
@@ -57,7 +60,16 @@ public class PlayerController : MonoBehaviour
     private float timeSinceAttack;
     [Space(5)]
 
+    [Header("Recoil Settings:")]
+    [SerializeField] private int recoilXSteps = 5;
+    [SerializeField] private int recoilYSteps = 5;
 
+    [SerializeField] private float recoilXSpeed = 100; //the speed of horizontal recoil
+    [SerializeField] private float recoilYSpeed = 100; //the speed of vertical recoil
+
+    private int stepsXRecoiled;
+    private int stepsYRecoiled;
+    [Space(5)]
 
     //References
     PlayerStateList pState;
@@ -109,19 +121,20 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawWireCube(DownAttackTransform.position, DownAttackArea);
     }
 
-    void Update() 
+    void Update()
     {
         GetInputs();
         UpdateJumpVariables();
 
         //Freeze movement options if dashing
-        if(pState.isDashing) return;
+        if (pState.isDashing) return;
 
         Flip();
         Move();
         Jump();
         StartDash();
         Attack();
+        Recoil();
     }
 
     void GetInputs() 
@@ -199,32 +212,34 @@ public class PlayerController : MonoBehaviour
             //call hit function based on where player is attacking
             if (yAxis == 0 || yAxis < 0 && Grounded())
             {
-                Hit(SideAttackTransform, SideAttackArea);
+                Hit(SideAttackTransform, SideAttackArea, ref pState.recoilingX, recoilXSpeed);
                 Instantiate(slashEffect, SideAttackTransform);
             }
 
             else if (yAxis > 0)
             {
-                Hit(UpAttackTransform, UpAttackArea);
+                Hit(UpAttackTransform, UpAttackArea, ref pState.recoilingY, recoilYSpeed);
                 SlashEffectAtAngle(slashEffect, 90, UpAttackTransform);
             }
 
             else if (yAxis < 0 && !Grounded())
             {
-                Hit(DownAttackTransform, DownAttackArea);
+                Hit(DownAttackTransform, DownAttackArea, ref pState.recoilingY, recoilYSpeed);
                 SlashEffectAtAngle(slashEffect, -90, DownAttackTransform);
             }
         }
     }
 
-    private void Hit(Transform _attackTransform, Vector2 _attackArea)
+    private void Hit(Transform _attackTransform, Vector2 _attackArea, ref bool _recoilDir, float _recoilStrength)
     {
         Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
         List<Enemy> hitEnemies = new List<Enemy>();
 
         if (objectsToHit.Length > 0)
         {
-            Debug.Log("Hit");
+            //Debugging for hit detection
+            //Debug.Log("Hit");
+            _recoilDir = true;
         }
 
         for (int i = 0; i < objectsToHit.Length; i++)
@@ -232,7 +247,7 @@ public class PlayerController : MonoBehaviour
             Enemy e = objectsToHit[i].GetComponent<Enemy>();
             if (e && !hitEnemies.Contains(e))
             {
-                e.EnemyHit(damage);
+                e.EnemyHit(damage, (transform.position - objectsToHit[i].transform.position).normalized, _recoilStrength);
                 hitEnemies.Add(e);
             }
         }
@@ -243,6 +258,76 @@ public class PlayerController : MonoBehaviour
         _slashEffect = Instantiate(_slashEffect, _attackTransform);
         _slashEffect.transform.eulerAngles = new Vector3(0, 0, _effectAngle);
         _slashEffect.transform.localScale = new Vector2(transform.localScale.x, transform.localScale.y);
+    }
+
+    void Recoil()
+    {
+        //perform recoil
+        if (pState.recoilingX)
+        {
+            if (pState.lookingRight)
+            {
+                rb.linearVelocity = new Vector2(-recoilXSpeed, 0);
+            }
+
+            else
+            {
+                rb.linearVelocity = new Vector2(recoilXSpeed, 0);
+            }
+        }
+
+        if (pState.recoilingY)
+        {
+            rb.gravityScale = 0;
+            if (yAxis < 0)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, recoilYSpeed);
+            }
+
+            else
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, -recoilYSpeed);
+            }
+            airJumpCounter = 0;
+        }
+
+        else
+        {
+            rb.gravityScale = gravity;
+        }
+
+        //stop recoil
+        if (pState.recoilingX && stepsXRecoiled < recoilXSteps)
+        {
+            stepsXRecoiled++;
+        }
+
+        else
+        {
+            StopRecoilX();
+        }
+
+        if (pState.recoilingY && stepsYRecoiled < recoilYSteps)
+        {
+            stepsYRecoiled++;
+        }
+
+        else
+        {
+            StopRecoilY();
+        }
+    }
+
+    void StopRecoilX()
+    {
+        stepsXRecoiled = 0;
+        pState.recoilingX = false;
+    }
+
+    void StopRecoilY()
+    {
+        stepsYRecoiled = 0;
+        pState.recoilingY = false;
     }
 
     //Set up raycast for hit detection on ground
