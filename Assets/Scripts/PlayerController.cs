@@ -107,7 +107,7 @@ public class PlayerController : MonoBehaviour
             Instance = this;
         }
 
-        health = maxHealth;
+        Health = maxHealth;
     }
 
     void Start()
@@ -340,7 +340,7 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(float _damage)
     {
-        health = Mathf.Clamp(health, 0, maxHealth);
+        Health -= Mathf.Clamp(health, 0, maxHealth);
         StartCoroutine(StopTakingDamage());
     }
 
@@ -349,16 +349,23 @@ public class PlayerController : MonoBehaviour
     {
         pState.invincible = true;
         anim.SetTrigger("TakeDamage");
-        ClampHealth();
         //instanciate i frames
         yield return new WaitForSeconds(1f);
         pState.invincible = false;
     }
 
-    //Stop health from dropping below 0
-    void ClampHealth()
+    //Create health property
+    public int Health
     {
-        health = Mathf.Clamp(health, 0, maxHealth);
+        get { return health; }
+        set
+        {
+            //manage health
+            if (health != value)
+            {
+                health = Mathf.Clamp(value, 0, maxHealth);
+            }
+        }
     }
 
     //Set up raycast for hit detection on ground
