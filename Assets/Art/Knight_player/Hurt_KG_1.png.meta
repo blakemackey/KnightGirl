@@ -46,7 +46,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -84,7 +84,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -112,10 +112,10 @@ TextureImporter:
       name: Hurt_KG_1_0
       rect:
         serializedVersion: 2
-        x: 28
+        x: 0
         y: 0
-        width: 38
-        height: 61
+        width: 100
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -134,10 +134,10 @@ TextureImporter:
       name: Hurt_KG_1_1
       rect:
         serializedVersion: 2
-        x: 104
+        x: 100
         y: 0
-        width: 59
-        height: 54
+        width: 100
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -156,10 +156,10 @@ TextureImporter:
       name: Hurt_KG_1_2
       rect:
         serializedVersion: 2
-        x: 215
+        x: 200
         y: 0
-        width: 47
-        height: 61
+        width: 100
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -178,10 +178,10 @@ TextureImporter:
       name: Hurt_KG_1_3
       rect:
         serializedVersion: 2
-        x: 326
+        x: 300
         y: 0
-        width: 35
-        height: 62
+        width: 100
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -200,7 +200,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: c18169189c2fdbb4c8f8561b4818f75f
     internalID: 0
     vertices: []
     indices: 
