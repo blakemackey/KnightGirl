@@ -71,16 +71,22 @@ public class PlayerController : MonoBehaviour
     private int stepsYRecoiled;
     [Space(5)]
 
+    
+    [Header("Health Settings:")]
+    public int health;
+    public int maxHealth;
+    [Space(5)]
+
     //References
-    PlayerStateList pState;
-    Rigidbody2D rb;
+    [HideInInspector] public PlayerStateList pState;
+    private Rigidbody2D rb;
 
     private bool attack = false;
     private float xAxis;
     private float yAxis;
 
     private float gravity;
-    Animator anim;
+    private Animator anim;
     private bool canDash = true;
     //Check if dash has been used in 
 
@@ -91,15 +97,17 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         //Destroy player objects that arent the one being controlled
-        if(Instance != null && Instance != this) 
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
         }
 
-        else 
+        else
         {
             Instance = this;
         }
+
+        health = maxHealth;
     }
 
     void Start() 
@@ -219,13 +227,13 @@ public class PlayerController : MonoBehaviour
             else if (yAxis > 0)
             {
                 Hit(UpAttackTransform, UpAttackArea, ref pState.recoilingY, recoilYSpeed);
-                SlashEffectAtAngle(slashEffect, 90, UpAttackTransform);
+                SlashEffectAtAngle(slashEffect, 80, UpAttackTransform);
             }
 
             else if (yAxis < 0 && !Grounded())
             {
                 Hit(DownAttackTransform, DownAttackArea, ref pState.recoilingY, recoilYSpeed);
-                SlashEffectAtAngle(slashEffect, -90, DownAttackTransform);
+                SlashEffectAtAngle(slashEffect, -80, DownAttackTransform);
             }
         }
     }
@@ -328,6 +336,26 @@ public class PlayerController : MonoBehaviour
     {
         stepsYRecoiled = 0;
         pState.recoilingY = false;
+    }
+
+    public void TakeDamage(float _damage)
+    {
+        health = Mathf.Clamp(health, 0, maxHealth);
+    }
+
+    //Add invincibility frames
+    IEnumerator StopTakingDamage()
+    {
+        pState.invincible = true;
+        ClampHealth();
+        //instanciate i frames
+        yield return new WaitForSeconds(1f);
+        pState.invincible = false;
+    }
+
+    void ClampHealth()
+    {
+        health = Mathf.Clamp(health, 0, maxHealth);
     }
 
     //Set up raycast for hit detection on ground
