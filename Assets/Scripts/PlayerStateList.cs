@@ -4,8 +4,8 @@ public class PlayerStateList : MonoBehaviour
 {
     public bool isJumping = false;
     public bool isDashing = false;
-    public bool recoilingX;
-    public bool recoilingY;
-    public bool lookingRight;
-    public bool invincible;
+    public bool isRecoilingX;
+    public bool isRecoilingY;
+    public bool isLookingRight;
+    public bool isInvincible;
 }
