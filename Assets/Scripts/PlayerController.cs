@@ -145,11 +145,17 @@ public class PlayerController : MonoBehaviour
         Recoil();
     }
 
+    private void FixedUpdate()
+    {
+        if (pState.isDashing) return;
+        Recoil();   
+    }
+
     void GetInputs() 
     {
         xAxis = Input.GetAxisRaw("Horizontal");
         yAxis = Input.GetAxisRaw("Vertical");
-        attack = Input.GetMouseButtonDown(0);
+        attack = Input.GetButtonDown("Attack");
     }
 
     //Flip sprite when changing directions
@@ -220,19 +226,19 @@ public class PlayerController : MonoBehaviour
             //call hit function based on where player is attacking
             if (yAxis == 0 || yAxis < 0 && Grounded())
             {
-                Hit(SideAttackTransform, SideAttackArea, ref pState.recoilingX, recoilXSpeed);
+                Hit(SideAttackTransform, SideAttackArea, ref pState.isRecoilingX, recoilXSpeed);
                 Instantiate(slashEffect, SideAttackTransform);
             }
 
             else if (yAxis > 0)
             {
-                Hit(UpAttackTransform, UpAttackArea, ref pState.recoilingY, recoilYSpeed);
+                Hit(UpAttackTransform, UpAttackArea, ref pState.isRecoilingY, recoilYSpeed);
                 SlashEffectAtAngle(slashEffect, 80, UpAttackTransform);
             }
 
             else if (yAxis < 0 && !Grounded())
             {
-                Hit(DownAttackTransform, DownAttackArea, ref pState.recoilingY, recoilYSpeed);
+                Hit(DownAttackTransform, DownAttackArea, ref pState.isRecoilingY, recoilYSpeed);
                 SlashEffectAtAngle(slashEffect, -80, DownAttackTransform);
             }
         }
@@ -271,9 +277,9 @@ public class PlayerController : MonoBehaviour
     void Recoil()
     {
         //perform recoil
-        if (pState.recoilingX)
+        if (pState.isRecoilingX)
         {
-            if (pState.lookingRight)
+            if (pState.isLookingRight)
             {
                 rb.linearVelocity = new Vector2(-recoilXSpeed, 0);
             }
@@ -284,7 +290,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (pState.recoilingY)
+        if (pState.isRecoilingY)
         {
             rb.gravityScale = 0;
             if (yAxis < 0)
@@ -305,7 +311,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //stop recoil
-        if (pState.recoilingX && stepsXRecoiled < recoilXSteps)
+        if (pState.isRecoilingX && stepsXRecoiled < recoilXSteps)
         {
             stepsXRecoiled++;
         }
@@ -315,7 +321,7 @@ public class PlayerController : MonoBehaviour
             StopRecoilX();
         }
 
-        if (pState.recoilingY && stepsYRecoiled < recoilYSteps)
+        if (pState.isRecoilingY && stepsYRecoiled < recoilYSteps)
         {
             stepsYRecoiled++;
         }
@@ -329,13 +335,13 @@ public class PlayerController : MonoBehaviour
     void StopRecoilX()
     {
         stepsXRecoiled = 0;
-        pState.recoilingX = false;
+        pState.isRecoilingX = false;
     }
 
     void StopRecoilY()
     {
         stepsYRecoiled = 0;
-        pState.recoilingY = false;
+        pState.isRecoilingY = false;
     }
 
     public void TakeDamage(float _damage)
@@ -347,11 +353,11 @@ public class PlayerController : MonoBehaviour
     //Add invincibility frames
     IEnumerator StopTakingDamage()
     {
-        pState.invincible = true;
+        pState.isInvincible = true;
         anim.SetTrigger("TakeDamage");
         //instanciate i frames
         yield return new WaitForSeconds(1f);
-        pState.invincible = false;
+        pState.isInvincible = false;
     }
 
     //Create health property
