@@ -110,7 +110,7 @@ public class PlayerController : MonoBehaviour
         health = maxHealth;
     }
 
-    void Start() 
+    void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
@@ -341,18 +341,21 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage(float _damage)
     {
         health = Mathf.Clamp(health, 0, maxHealth);
+        StartCoroutine(StopTakingDamage());
     }
 
     //Add invincibility frames
     IEnumerator StopTakingDamage()
     {
         pState.invincible = true;
+        anim.SetTrigger("TakeDamage");
         ClampHealth();
         //instanciate i frames
         yield return new WaitForSeconds(1f);
         pState.invincible = false;
     }
 
+    //Stop health from dropping below 0
     void ClampHealth()
     {
         health = Mathf.Clamp(health, 0, maxHealth);
